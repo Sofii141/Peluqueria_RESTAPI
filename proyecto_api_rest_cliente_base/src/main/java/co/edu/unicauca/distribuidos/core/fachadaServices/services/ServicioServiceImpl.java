@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,18 +15,25 @@ import co.edu.unicauca.distribuidos.core.capaAccesoADatos.models.ServicioEntity;
 import co.edu.unicauca.distribuidos.core.capaAccesoADatos.repositories.ServicioRepository;
 import co.edu.unicauca.distribuidos.core.fachadaServices.DTO.ServicioDTOPeticion;
 import co.edu.unicauca.distribuidos.core.fachadaServices.DTO.ServicioDTORespuesta;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class ServicioServiceImpl implements IServicioService {
 	private final ServicioRepository servicioRepository;
 	private final ModelMapper modelMapper;
+	private final FileStorageService storageService;
+	private final ObjectMapper objectMapper;
 
 	@Autowired
-	public ServicioServiceImpl(ServicioRepository servicioRepository, ModelMapper modelMapper) {
+	public ServicioServiceImpl(ServicioRepository servicioRepository,
+							   ModelMapper modelMapper,
+							   FileStorageService storageService,
+							   ObjectMapper objectMapper) {
 		this.servicioRepository = servicioRepository;
 		this.modelMapper = modelMapper;
+		this.storageService = storageService;
+		this.objectMapper = objectMapper;
 	}
-
 	@Override
 	public List<ServicioDTORespuesta> findAll() {
 		Optional<Collection<ServicioEntity>> serviciosEntityOpt = this.servicioRepository.findAll();
@@ -54,14 +62,8 @@ public class ServicioServiceImpl implements IServicioService {
 	@Override
 	public ServicioDTORespuesta save(ServicioDTOPeticion servicio) {
 		ServicioEntity servicioEntity = this.modelMapper.map(servicio, ServicioEntity.class);
-
-		// Asignamos la fecha de creación del lado del servidor para asegurar consistencia
 		servicioEntity.setFechaCreacion(new Date());
-
-		// Guardamos la nueva entidad en la base de datos
 		ServicioEntity objServicioEntity = this.servicioRepository.save(servicioEntity);
-
-		// Mapeamos la entidad guardada (con su nuevo ID) a un DTO de respuesta
 		return this.modelMapper.map(objServicioEntity, ServicioDTORespuesta.class);
 	}
 
@@ -108,5 +110,29 @@ public class ServicioServiceImpl implements IServicioService {
 
 		Collection<ServicioEntity> serviciosEntity = serviciosEntityOpt.get();
 		return this.modelMapper.map(serviciosEntity, new TypeToken<List<ServicioDTORespuesta>>() {}.getType());
+	}
+
+	@Override
+	public ServicioDTORespuesta saveWithImage(MultipartFile imagenFile, String servicioJson) {
+		try {
+			// Paso A: Guardar la imagen en el disco y obtener su nombre único
+			String nombreImagen = storageService.save(imagenFile);
+
+			// Paso B: Construir la URL pública completa para la imagen
+			String imageUrl = "http://localhost:5000/uploads/images/" + nombreImagen;
+
+			// Paso C: Convertir el texto JSON del servicio a un objeto DTO
+			ServicioDTOPeticion servicioDTO = objectMapper.readValue(servicioJson, ServicioDTOPeticion.class);
+
+			// Paso D: Asignar la URL de la imagen al objeto del servicio
+			servicioDTO.setImagen(imageUrl);
+
+			// Paso E: Llamar al método save existente para reutilizar la lógica de guardado
+			return this.save(servicioDTO);
+
+		} catch (Exception e) {
+			// Lanzar una excepción de runtime para que el controlador la pueda capturar
+			throw new RuntimeException("Fallo al procesar el servicio con imagen", e);
+		}
 	}
 }

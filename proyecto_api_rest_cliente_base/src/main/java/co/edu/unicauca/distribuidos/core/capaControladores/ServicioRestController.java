@@ -2,20 +2,14 @@ package co.edu.unicauca.distribuidos.core.capaControladores;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import co.edu.unicauca.distribuidos.core.fachadaServices.DTO.ServicioDTOPeticion; // CAMBIO
 import co.edu.unicauca.distribuidos.core.fachadaServices.DTO.ServicioDTORespuesta; // CAMBIO
 import co.edu.unicauca.distribuidos.core.fachadaServices.services.IServicioService; // CAMBIO
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api")
@@ -41,18 +35,32 @@ public class ServicioRestController {
 		return servicioService.findById(id);
 	}
 
-	@PostMapping("/servicios")
-	public ServicioDTORespuesta crearServicio(@RequestBody ServicioDTOPeticion servicio) {
-		return servicioService.save(servicio);
-	}
-
 	@PutMapping("/servicios/{id}")
-	public ServicioDTORespuesta actualizarServicio(@RequestBody ServicioDTOPeticion servicio, @PathVariable Integer id) { // CAMBIO
+	public ServicioDTORespuesta actualizarServicio(@RequestBody ServicioDTOPeticion servicio, @PathVariable Integer id) {
 		return servicioService.update(id, servicio);
 	}
 
 	@DeleteMapping("/servicios/{id}")
 	public Boolean eliminarServicio(@PathVariable Integer id) {
 		return servicioService.delete(id);
+	}
+
+	@PostMapping(value = "/servicios", consumes = "application/json")
+	public ResponseEntity<ServicioDTORespuesta> crearServicio(@RequestBody ServicioDTOPeticion servicio) {
+		ServicioDTORespuesta nuevoServicio = servicioService.save(servicio);
+		return new ResponseEntity<>(nuevoServicio, HttpStatus.CREATED);
+	}
+
+
+	@PostMapping(value = "/servicios/con-imagen", consumes = "multipart/form-data")
+	public ResponseEntity<ServicioDTORespuesta> crearServicioConImagen(
+			@RequestParam("imagen") MultipartFile imagenFile,
+			@RequestParam("servicio") String servicioJson) {
+		try {
+			ServicioDTORespuesta nuevoServicio = servicioService.saveWithImage(imagenFile, servicioJson);
+			return new ResponseEntity<>(nuevoServicio, HttpStatus.CREATED);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }
