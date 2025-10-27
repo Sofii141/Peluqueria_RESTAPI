@@ -1,0 +1,29 @@
+<!-- src/app/header/header.component.html -->
+<nav class="navbar navbar-expand-lg sticky-top">
+  <div class="container">
+    <a class="navbar-brand" [routerLink]="['/']">Beauty Salon</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['/']" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['/servicios']" routerLinkActive="active">Servicios</a>
+        </li>
+        <!-- REQUERIMIENTO: Se agregan los enlaces a Ofertas, Cupones y Ayuda como pide la guía -->
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['/ofertas']" routerLinkActive="active">Ofertas</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['/cupones']" routerLinkActive="active">Cupones</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['/ayuda']" routerLinkActive="active">Ayuda/PQR</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
