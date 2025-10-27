@@ -2,7 +2,7 @@
 /* 1. IMPORTACIÓN DE FUENTES Y CONFIGURACIÓN GENERAL
 /* =================================================================== */
 
-/* Importamos las fuentes de Google que usaba tu plantilla */
+/* Importamos las fuentes de Google que usa la plantilla */
 @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Raleway:wght@300;400;700&display=swap');
 
 /* Activa el desplazamiento suave */
@@ -25,14 +25,14 @@ body {
 .section-title {
     font-family: 'Great Vibes', cursive;
     font-weight: normal;
-    color: #fff;
-    font-size: clamp(3.5rem, 8vw, 5rem); /* Ajustado para ser un poco más sutil */
+    color: #fff; /* <-- ESTILO DEL TÍTULO CORREGIDO */
+    font-size: clamp(3.5rem, 8vw, 5rem);
     letter-spacing: normal;
 }
 
 /* Estilo para las tarjetas que mostrarán los servicios */
 .card {
-  background-color: #2a2a2e !important; /* !important para sobreescribir Bootstrap */
+  background-color: #2a2a2e !important;
   border-radius: 0.5rem;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   overflow: hidden;
@@ -41,7 +41,7 @@ body {
 }
 
 .card:hover {
-  transform: translateY(-8px); /* Eleva la tarjeta al pasar el ratón */
+  transform: translateY(-8px);
   box-shadow: 0 10px 35px rgba(0,0,0,0.5);
 }
 
@@ -53,31 +53,58 @@ body {
 }
 
 /* =================================================================== */
-/* 3. ESTILOS DE FORMULARIO Y BOTONES
+/* 3. ESTILOS DE FORMULARIO
 /* =================================================================== */
 
-/* Estilo para los formularios (Crear/Actualizar Servicio) */
-.form-control {
-    background-color: #333 !important;
+/* Estilo para todos los inputs, textareas y selects */
+.form-control,
+.form-select {
+    background-color: #3a3a3e !important;
     border-color: #555 !important;
-    color: #fff !important;
+    color: #f8f9fa !important;
+    border-radius: 0.5rem;
 }
 
-.form-control:focus {
-    background-color: #333 !important;
-    border-color: #D4AF37 !important; /* Borde se vuelve dorado */
+/* Estilo para el texto de ejemplo (placeholder) */
+.form-control::placeholder {
+  color: #999 !important;
+  opacity: 1;
+}
+
+/* Efecto al hacer clic (focus) en cualquier campo del formulario */
+.form-control:focus,
+.form-select:focus {
+    background-color: #3a3a3e !important;
+    border-color: #D4AF37 !important;
     color: #fff !important;
     box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.35) !important;
 }
 
+/* Estilo para el ícono de '$' en el campo de precio */
+.input-group-text {
+    background-color: #444 !important;
+    border-color: #555 !important;
+    color: #f8f9fa !important;
+}
+
+/* Estilo para el switch de "disponible" cuando está activo */
 .form-check-input:checked {
     background-color: #D4AF37;
     border-color: #D4AF37;
 }
 
+/* Flecha dorada para el campo 'select' */
+.form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23d4af37' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+/* =================================================================== */
+/* 4. ESTILOS DE BOTONES
+/* =================================================================== */
+
 /* Estilo principal para los botones de acción */
 .btn-primary {
-    background: linear-gradient(to bottom, #E6C37A, #D4AF37);
+    background: linear-gradient(to bottom, #E6C37A, #D4AF37); /* <-- ESTILO DEL BOTÓN CORREGIDO */
     border-color: #D4AF37;
     color: #1c1c1e;
     font-weight: 600;
@@ -92,7 +119,7 @@ body {
 }
 
 /* =================================================================== */
-/* 4. BARRA DE DESPLAZAMIENTO PERSONALIZADA
+/* 5. BARRA DE DESPLAZAMIENTO PERSONALIZADA
 /* =================================================================== */
 ::-webkit-scrollbar {
   width: 12px;
@@ -109,59 +136,6 @@ body {
   background-color: #E6C37A;
 }
 
-
-/* src/styles.css (al final) */
-.carousel-item-fixed {
-  height: 70vh;
-  min-height: 450px;
-}
-
-.carousel-item-fixed img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  opacity: 0.5;
-}
-
-.carousel-caption h5 {
-  font-family: 'Great Vibes', cursive;
-  font-size: clamp(3rem, 7vw, 5.5rem);
-  font-weight: normal;
-  text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
-}
-
-.carousel-caption p {
-  font-family: 'Raleway', sans-serif;
-  font-size: 1.2rem;
-  text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
-}
-
-/* src/styles.css (al final) */
-.list-group-item {
-  background-color: #2a2a2e;
-  border: 1px solid #444444;
-  color: #f8f9fa;
-  transition: background-color 0.3s ease, padding-left 0.3s ease;
-}
-
-.list-group-item.active {
-  background-color: #D4AF37; /* Color dorado para el activo */
-  border-color: #D4AF37;
-  color: #1c1c1e; /* Texto oscuro para contraste */
-  font-weight: 600;
-}
-
-.list-group-item:hover {
-    background-color: #3a3a3e;
-    padding-left: 1.5rem;
-}
-
-/* src/styles.css (al final) */
-.form-wrapper {
-  background-color: #2a2a2e;
-  padding: 2.5rem;
-  border-radius: 0.5rem;
-  border: 1px solid #444;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+body {
+  padding-top: 90px;
 }

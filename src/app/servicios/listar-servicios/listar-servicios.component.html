@@ -1,16 +1,16 @@
-<!-- src/app/servicios/listar-servicios/listar-servicios.component.html (ACTUALIZADO) -->
 <section class="full-page-section">
   <div class="container">
 
     <!-- 1. ENCABEZADO DE LA PÁGINA: TÍTULO Y BOTÓN DE AÑADIR -->
     <div class="page-header mb-5">
       <h2 class="section-title">Nuestros Servicios</h2>
-      <button class="btn btn-primary" type="button" [routerLink]="['/servicios/crear']">
+      <!-- OCULTAR ESTE BOTÓN SI EL USUARIO NO ES ADMINISTRADOR -->
+      <button *ngIf="isAdmin" class="btn btn-primary" type="button" [routerLink]="['/servicios/crear']">
         <i class="fas fa-plus-circle me-2"></i>Añadir Servicio
       </button>
     </div>
 
-    <!-- 2. FILTROS DE CATEGORÍA (IDÉNTICOS A LA PÁGINA DE INICIO) -->
+    <!-- ... (El resto del código de los filtros se mantiene igual) ... -->
     <div class="category-filters my-5">
       <button
         class="filter-btn"
@@ -44,7 +44,8 @@
           <!-- 4. PIE DE TARJETA CON PRECIO Y BOTONES DE ACCIÓN -->
           <div class="card-footer">
             <p class="price mb-0">${{ servicio.precio | number }}</p>
-            <div class="action-buttons">
+            <!-- OCULTAR ESTOS BOTONES SI EL USUARIO NO ES ADMINISTRADOR -->
+            <div *ngIf="isAdmin" class="action-buttons">
               <button (click)="editarServicio(servicio.id)" class="btn btn-icon btn-edit">
                 <i class="fas fa-pencil-alt"></i>
               </button>
@@ -57,7 +58,7 @@
       </div>
     </div>
 
-    <!-- Mensaje si no hay servicios -->
+    <!-- ... (El mensaje de "no hay servicios" se mantiene igual) ... -->
     <div *ngIf="serviciosFiltrados.length === 0" class="no-services-message">
       <p>No se encontraron servicios en esta categoría.</p>
     </div>

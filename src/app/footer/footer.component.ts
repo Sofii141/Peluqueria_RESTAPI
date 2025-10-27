@@ -1,15 +1,13 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router'; 
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [],
+  imports: [RouterLink], 
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.css'
 })
 export class FooterComponent {
-  public proyecto: any = {anio: '2024', nombreProyecto: 'Proyecto de Clase'};
-  public tecnologia: any = {leyenda: 'WebApp desarrollada con ', tec1: 'Angular ', tec2: 'Spring-Spring Boot'};
-  public autor: string = 'Desarrollado por ...';
+  public anio: number = new Date().getFullYear(); 
 }
-

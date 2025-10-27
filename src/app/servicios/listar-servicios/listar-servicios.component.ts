@@ -1,4 +1,3 @@
-// src/app/servicios/listar-servicios/listar-servicios.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Servicio } from '../modelos/servicio';
 import { CommonModule } from '@angular/common';
@@ -7,44 +6,46 @@ import { ServicioService } from '../servicios/servicio.service';
 import { HttpClientModule } from '@angular/common/http';
 import Swal from 'sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
-import { Categoria } from '../../categorias/modelos/categoria'; // Importa el modelo
-import { CategoriaService } from '../../categorias/servicios/categoria.service'; // Importa el servicio
+import { Categoria } from '../../categorias/modelos/categoria';
+import { CategoriaService } from '../../categorias/servicios/categoria.service';
+import { AuthService } from '../../auth/auth.service'; // 1. IMPORTAR AuthService
 
 @Component({
   selector: 'app-listar-servicios',
   standalone: true,
   imports: [CommonModule, RouterLink, HttpClientModule, SweetAlert2Module],
   templateUrl: './listar-servicios.component.html',
-  styleUrls: ['./listar-servicios.component.css'] // Corregido a styleUrls
+  styleUrls: ['./listar-servicios.component.css']
 })
 export class ListarServiciosComponent implements OnInit {
 
   servicios: Servicio[] = [];
-  serviciosFiltrados: Servicio[] = []; // Nuevo array para mostrar
+  serviciosFiltrados: Servicio[] = [];
   categorias: Categoria[] = [];
   categoriaActiva: string | number = 'all';
+  public isAdmin: boolean = false; // 2. AÑADIR PROPIEDAD PARA VERIFICAR ROL
 
-  // Inyecta el CategoriaService
   constructor(
     private objServicioService: ServicioService,
     private objCategoriaService: CategoriaService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService // 3. INYECTAR AuthService
   ) {}
 
   ngOnInit(): void {
-    // Carga las categorías
+    // 4. ESTABLECER EL VALOR DE isAdmin AL INICIAR
+    this.isAdmin = this.authService.isAdmin();
+    
     this.objCategoriaService.getCategorias().subscribe(categorias => {
       this.categorias = categorias;
     });
 
-    // Carga los servicios
     this.objServicioService.getServicios().subscribe(servicios => {
       this.servicios = servicios;
-      this.serviciosFiltrados = servicios; // Inicialmente, muestra todos
+      this.serviciosFiltrados = servicios;
     });
   }
 
-  // Nueva función para filtrar
   filtrarServicios(categoriaId: string | number): void {
     this.categoriaActiva = categoriaId;
     if (categoriaId === 'all') {
@@ -73,7 +74,6 @@ export class ListarServiciosComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.objServicioService.deleteServicio(id).subscribe(() => {
-          // Filtra ambos arrays
           this.servicios = this.servicios.filter(s => s.id !== id);
           this.serviciosFiltrados = this.serviciosFiltrados.filter(s => s.id !== id);
           Swal.fire('Eliminado', 'El servicio ha sido eliminado.', 'success');

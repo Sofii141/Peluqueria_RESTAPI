@@ -70,5 +70,13 @@ export class ServicioService {
     );
   }
 
+  updateWithImage(id: number, formData: FormData): Observable<Servicio> {
+    console.log("Actualizando servicio con imagen desde el servicio");
+    // Usamos PUT para la actualización
+    return this.http.put<Servicio>(`${this.urlEndPoint}/con-imagen/${id}`, formData).pipe(
+      catchError(this.handleError)
+    );
+  }
+
 
 }

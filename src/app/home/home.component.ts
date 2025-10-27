@@ -1,14 +1,15 @@
-// src/app/home/home.component.ts (LIMPIO Y CORRECTO)
 import { Component } from '@angular/core';
-import { FeaturedServicesComponent } from '../featured-services/featured-services.component'; // 1. IMPORTAR
-
+import { FeaturedServicesComponent } from '../featured-services/featured-services.component';
+import { HeroCarouselComponent } from '../hero-carousel/hero-carousel.component';
+import { EstilistasComponent } from '../estilistas/estilistas.component';
+import { ProcesoReservaComponent } from '../proceso-reserva/proceso-reserva.component';
+import { UbicacionContactoComponent } from '../ubicacion-contacto/ubicacion-contacto.component';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FeaturedServicesComponent], // 2. AÑADIR A IMPORTS
+  imports: [HeroCarouselComponent, FeaturedServicesComponent, EstilistasComponent, ProcesoReservaComponent, UbicacionContactoComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css' 
 })
 export class HomeComponent {
-  // ¡Ya no necesita lógica de servicios!
 }
