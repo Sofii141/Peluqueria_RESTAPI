@@ -63,4 +63,21 @@ public class ServicioRestController {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	@PutMapping(value = "/servicios/con-imagen/{id}", consumes = "multipart/form-data")
+	public ResponseEntity<ServicioDTORespuesta> actualizarServicioConImagen(
+			@PathVariable Integer id,
+			@RequestParam(value = "imagen", required = false) MultipartFile imagenFile, // La imagen es opcional
+			@RequestParam("servicio") String servicioJson) {
+		try {
+			ServicioDTORespuesta servicioActualizado = servicioService.updateWithImage(id, imagenFile, servicioJson);
+			if (servicioActualizado != null) {
+				return new ResponseEntity<>(servicioActualizado, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

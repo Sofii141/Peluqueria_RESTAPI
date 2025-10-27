@@ -13,4 +13,5 @@ public interface IServicioService {
 	public boolean delete(Integer id);
 	public List<ServicioDTORespuesta> findByCategoriaId(Integer idCategoria);
 	public ServicioDTORespuesta saveWithImage(MultipartFile imagenFile, String servicioJson);
+	public ServicioDTORespuesta updateWithImage(Integer id, MultipartFile imagenFile, String servicioJson);
 }

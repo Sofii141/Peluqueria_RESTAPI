@@ -34,6 +34,30 @@ public class ServicioServiceImpl implements IServicioService {
 		this.storageService = storageService;
 		this.objectMapper = objectMapper;
 	}
+
+	@Override
+	public ServicioDTORespuesta updateWithImage(Integer id, MultipartFile imagenFile, String servicioJson) {
+		try {
+			// Paso A: Convertir el texto JSON del servicio a un objeto DTO
+			ServicioDTOPeticion servicioDTO = objectMapper.readValue(servicioJson, ServicioDTOPeticion.class);
+
+			// Paso B: Guardar la nueva imagen y actualizar la URL en el DTO
+			// Solo si se proporciona un nuevo archivo de imagen.
+			if (imagenFile != null && !imagenFile.isEmpty()) {
+				String nombreImagen = storageService.save(imagenFile);
+				String imageUrl = "http://localhost:5000/uploads/images/" + nombreImagen;
+				servicioDTO.setImagen(imageUrl);
+			}
+
+			// Paso C: Llamar al método 'update' existente para reutilizar la lógica de actualización
+			return this.update(id, servicioDTO);
+
+		} catch (Exception e) {
+			// Lanzar una excepción para que el controlador la pueda capturar
+			throw new RuntimeException("Fallo al procesar la actualización del servicio con imagen", e);
+		}
+	}
+
 	@Override
 	public List<ServicioDTORespuesta> findAll() {
 		Optional<Collection<ServicioEntity>> serviciosEntityOpt = this.servicioRepository.findAll();
