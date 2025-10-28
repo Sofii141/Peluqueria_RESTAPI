@@ -26,7 +26,9 @@
             </div>
             <div class="col-md-6 form-group mb-4">
               <label for="categoria">Categoría</label>
-              <select id="categoria" name="categoria" class="form-select" [(ngModel)]="servicio.objCategoria" [compareWith]="compararCategoria" required>
+              <select id="categoria" name="categoria" class="form-select" 
+                      [(ngModel)]="servicio.categoria" 
+                      [compareWith]="compararCategoria" required>
                 <option [ngValue]="null" disabled>Seleccione una categoría</option>
                 <option *ngFor="let categoria of categorias" [ngValue]="categoria">{{ categoria.nombre }}</option>
               </select>

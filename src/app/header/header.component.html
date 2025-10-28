@@ -1,4 +1,3 @@
-<!-- Usamos "fixed-top" para que la barra esté SIEMPRE fija en la parte superior -->
 <nav class="navbar navbar-expand-lg fixed-top">
   <div class="container">
     <a class="navbar-brand" [routerLink]="['/']">Beauty Salon</a>
@@ -11,8 +10,9 @@
         <li class="nav-item">
           <a class="nav-link" [routerLink]="['/']" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a>
         </li>
-        <li class="nav-item" *ngIf="(currentUserRole$ | async) === 'admin'">
-          <a class="nav-link" [routerLink]="['/servicios']" routerLinkActive="active">Servicios</a>
+        <!-- Mostramos el enlace a servicios si el rol es 'Admin' -->
+        <li class="nav-item" *ngIf="(currentUserRole$ | async) === 'Admin'">
+          <a class="nav-link" [routerLink]="['/servicios']" routerLinkActive="active">Gestionar Servicios</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" [routerLink]="['/ofertas']" routerLinkActive="active">Ofertas</a>
@@ -24,11 +24,12 @@
           <a class="nav-link" [routerLink]="['/ayuda']" routerLinkActive="active">Ayuda</a>
         </li>
         
+        <!-- Si hay un rol (sesión iniciada), muestra el menú de bienvenida -->
         <ng-container *ngIf="(currentUserRole$ | async) as role; else showLogin">
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="fas fa-user-circle me-1"></i>
-              Bienvenido, {{ role.charAt(0).toUpperCase() + role.slice(1) }}
+              Bienvenido, {{ role }}
             </a>
             <ul class="dropdown-menu dropdown-menu-dark">
               <li><a class="dropdown-item" (click)="logout()" style="cursor: pointer;">Cerrar Sesión</a></li>
@@ -36,15 +37,13 @@
           </li>
         </ng-container>
 
+        <!-- Si no hay rol, muestra los enlaces para iniciar sesión o registrarse -->
         <ng-template #showLogin>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Iniciar Sesión
-            </a>
-            <ul class="dropdown-menu dropdown-menu-dark">
-              <li><a class="dropdown-item" (click)="loginAsAdmin()" style="cursor: pointer;">Entrar como Administrador</a></li>
-              <li><a class="dropdown-item" (click)="loginAsClient()" style="cursor: pointer;">Entrar como Cliente</a></li>
-            </ul>
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/login']" routerLinkActive="active">Iniciar Sesión</a>
+          </li>
+           <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/register']" routerLinkActive="active">Registrarse</a>
           </li>
         </ng-template>
       </ul>

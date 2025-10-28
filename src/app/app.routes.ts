@@ -3,30 +3,32 @@ import { HomeComponent } from './home/home.component';
 import { ListarServiciosComponent } from './servicios/listar-servicios/listar-servicios.component';
 import { CrearServicioComponent } from './servicios/crear-servicio/crear-servicio.component';
 import { ActualizarServicioComponent } from './servicios/actualizar-servicio/actualizar-servicio.component';
-
 import { OfertasComponent } from './ofertas/ofertas.component';
 import { CuponesComponent } from './cupones/cupones.component';
 import { AyudaComponent } from './ayuda/ayuda.component';
-
-// 1. IMPORTAR EL NUEVO GUARDIA
 import { adminGuard } from './auth/auth.guard';
+// 1. IMPORTAR LOS NUEVOS COMPONENTES
+import { LoginComponent } from './auth/login/login.component';
+import { RegisterComponent } from './auth/register/register.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
+
+    // 2. AÑADIR RUTAS DE AUTENTICACIÓN
+    { path: 'login', component: LoginComponent },
+    { path: 'register', component: RegisterComponent },
     
     // Rutas de la funcionalidad principal (Servicios de la peluquería)
     { path: 'servicios', component: ListarServiciosComponent },
-    
-    // 2. APLICAR EL GUARDIA A LAS RUTAS PROTEGIDAS
     { 
       path: 'servicios/crear', 
       component: CrearServicioComponent,
-      canActivate: [adminGuard] // Solo los administradores pueden activar esta ruta
+      canActivate: [adminGuard]
     },
     { 
       path: 'servicios/actualizar/:id', 
       component: ActualizarServicioComponent,
-      canActivate: [adminGuard] // Solo los administradores pueden activar esta ruta
+      canActivate: [adminGuard]
     },
 
     // Rutas "Borrador"

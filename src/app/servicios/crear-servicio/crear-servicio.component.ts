@@ -13,10 +13,11 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './crear-servicio.component.html',
-  styleUrl: './crear-servicio.component.css'
+  styleUrls: ['./crear-servicio.component.css']
 })
 export class CrearServicioComponent implements OnInit {
-  public servicio: Servicio = new Servicio();
+  // --- CORREGIDO ---: Usamos 'categoria' en lugar de 'objCategoria' para consistencia
+  public servicio: Servicio = new Servicio(); 
   public categorias: Categoria[] = [];
   public titulo: String = 'Registrar Nuevo Servicio';
 
@@ -30,7 +31,8 @@ export class CrearServicioComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.servicio.objCategoria = null;
+    // --- CORREGIDO ---
+    this.servicio.categoria = null!; // Inicializamos la categoría a null
     this.servicio.disponible = true;
     this.categoriaService.getCategorias().subscribe(
       categorias => this.categorias = categorias
@@ -49,32 +51,47 @@ export class CrearServicioComponent implements OnInit {
     }
   }
 
+  // --- FUNCIÓN 'crearServicio' COMPLETAMENTE CORREGIDA ---
   public crearServicio(): void {
     if (!this.selectedFile) {
-      Swal.fire('Error', 'Debe seleccionar una imagen para el servicio.', 'error');
+      Swal.fire('Error de validación', 'Debe seleccionar una imagen para el servicio.', 'error');
+      return;
+    }
+    // Verificación adicional para la categoría
+    if (!this.servicio.categoria || this.servicio.categoria.id === 0) {
+      Swal.fire('Error de validación', 'Debe seleccionar una categoría para el servicio.', 'error');
       return;
     }
 
     const formData = new FormData();
-    formData.append('imagen', this.selectedFile);
 
-    const { imagen, ...servicioSinImagen } = this.servicio;
+    // 1. Añadimos cada propiedad del servicio como un campo separado.
+    // Las claves deben coincidir con las propiedades del DTO del backend.
+    formData.append('Nombre', this.servicio.nombre);
+    formData.append('Descripcion', this.servicio.descripcion);
+    formData.append('Precio', this.servicio.precio.toString());
+    formData.append('Disponible', this.servicio.disponible.toString());
+    formData.append('CategoriaId', this.servicio.categoria.id.toString());
+    
+    // 2. La clave para la imagen debe ser 'Imagen' (con 'I' mayúscula) para coincidir con el DTO.
+    formData.append('Imagen', this.selectedFile, this.selectedFile.name);
 
-    formData.append('servicio', JSON.stringify(servicioSinImagen));
-
+    // 3. Llamamos al servicio con el FormData correctamente construido.
     this.servicioService.createWithImage(formData).subscribe({
       next: (response) => {
         this.router.navigate(['/servicios']);
         Swal.fire('Nuevo Servicio', `Servicio ${response.nombre} creado con éxito!`, 'success');
       },
       error: (err) => {
-        console.error('Error al crear el servicio:', err);
-        Swal.fire('Error', 'Ocurrió un error al crear el servicio.', 'error');
+        // El handleError de tu servicio ya muestra un Swal genérico,
+        // pero aquí podemos loguear el error específico si queremos.
+        console.error('Error detallado al crear el servicio:', err);
       }
     });
-}
+  }
 
   compararCategoria(c1: Categoria, c2: Categoria): boolean {
+    // Se mantiene igual, es correcto
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
 }

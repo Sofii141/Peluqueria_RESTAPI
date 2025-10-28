@@ -3,51 +3,57 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Servicio } from '../servicios/modelos/servicio';
 import { ServicioService } from '../servicios/servicios/servicio.service';
-import { Categoria } from '../categorias/modelos/categoria'; // 1. IMPORTAR CATEGORIA
-import { CategoriaService } from '../categorias/servicios/categoria.service'; // 2. IMPORTAR SU SERVICIO
+import { Categoria } from '../categorias/modelos/categoria';
+import { CategoriaService } from '../categorias/servicios/categoria.service';
 
 @Component({
   selector: 'app-featured-services',
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './featured-services.component.html',
-  styleUrl: './featured-services.component.css'
+  styleUrls: ['./featured-services.component.css']
 })
 export class FeaturedServicesComponent implements OnInit {
 
-  public todosLosServicios: Servicio[] = [];
+  // --- PROPIEDADES SIMPLIFICADAS ---
+  // Ya no necesitamos el array 'todosLosServicios'
   public serviciosFiltrados: Servicio[] = [];
   public categorias: Categoria[] = [];
   public categoriaActiva: number | 'all' = 'all';
 
-  // 3. INYECTAR EL CATEGORIASERVICE
   constructor(
     private servicioService: ServicioService,
     private categoriaService: CategoriaService
   ) { }
 
   ngOnInit(): void {
-    // Obtenemos las categorías para los filtros
+    // Obtenemos las categorías para los botones de filtro, esto ya estaba bien
     this.categoriaService.getCategorias().subscribe(cats => {
       this.categorias = cats;
     });
 
-    // Obtenemos TODOS los servicios disponibles
-    this.servicioService.getServicios().subscribe(servicios => {
-      this.todosLosServicios = servicios.filter(s => s.disponible);
-      this.serviciosFiltrados = this.todosLosServicios; // Al inicio, mostramos todos
-    });
+    // --- LÓGICA MEJORADA ---
+    // Hacemos la carga inicial de "Todos" los servicios llamando a la función de filtro
+    this.filtrarServicios('all');
   }
 
-  // 4. NUEVA FUNCIÓN PARA FILTRAR
+  // --- FUNCIÓN DE FILTRADO OPTIMIZADA ---
+  // Ahora llama al backend para obtener solo los servicios necesarios
   filtrarServicios(idCategoria: number | 'all'): void {
     this.categoriaActiva = idCategoria;
-    if (idCategoria === 'all') {
-      this.serviciosFiltrados = this.todosLosServicios;
-    } else {
-      this.serviciosFiltrados = this.todosLosServicios.filter(
-        servicio => servicio.objCategoria?.id === idCategoria
-      );
-    }
+    
+    // Convertimos 'all' a 0 para que el ServicioService lo maneje correctamente
+    const idParaLaPeticion = idCategoria === 'all' ? 0 : idCategoria;
+
+    this.servicioService.getServiciosPorCategoria(idParaLaPeticion).subscribe(
+      servicios => {
+        // Adicionalmente, filtramos para mostrar solo los que están 'disponibles'
+        this.serviciosFiltrados = servicios.filter(s => s.disponible);
+      },
+      error => {
+        console.error('Error al filtrar servicios desde el backend:', error);
+        this.serviciosFiltrados = []; // En caso de error, la lista queda vacía
+      }
+    );
   }
 }

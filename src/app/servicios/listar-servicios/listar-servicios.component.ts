@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { Categoria } from '../../categorias/modelos/categoria';
 import { CategoriaService } from '../../categorias/servicios/categoria.service';
-import { AuthService } from '../../auth/auth.service'; // 1. IMPORTAR AuthService
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-listar-servicios',
@@ -19,48 +19,59 @@ import { AuthService } from '../../auth/auth.service'; // 1. IMPORTAR AuthServic
 })
 export class ListarServiciosComponent implements OnInit {
 
-  servicios: Servicio[] = [];
+  // --- PROPIEDADES SIMPLIFICADAS ---
+  // Ya no necesitamos un array para 'todos los servicios', solo el que se muestra
   serviciosFiltrados: Servicio[] = [];
   categorias: Categoria[] = [];
   categoriaActiva: string | number = 'all';
-  public isAdmin: boolean = false; // 2. AÑADIR PROPIEDAD PARA VERIFICAR ROL
+  public isAdmin: boolean = false;
 
   constructor(
     private objServicioService: ServicioService,
     private objCategoriaService: CategoriaService,
     private router: Router,
-    private authService: AuthService // 3. INYECTAR AuthService
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    // 4. ESTABLECER EL VALOR DE isAdmin AL INICIAR
+    // Verificamos el rol del usuario al iniciar
     this.isAdmin = this.authService.isAdmin();
     
+    // Obtenemos las categorías para los botones de filtro
     this.objCategoriaService.getCategorias().subscribe(categorias => {
       this.categorias = categorias;
     });
 
-    this.objServicioService.getServicios().subscribe(servicios => {
-      this.servicios = servicios;
-      this.serviciosFiltrados = servicios;
-    });
+    // --- LÓGICA MEJORADA ---
+    // Hacemos la carga inicial de los servicios llamando a nuestra nueva función de filtro
+    this.filtrarServicios('all');
   }
 
+  // --- FUNCIÓN DE FILTRADO OPTIMIZADA ---
+  // Ahora llama al backend para obtener solo los servicios necesarios
   filtrarServicios(categoriaId: string | number): void {
     this.categoriaActiva = categoriaId;
-    if (categoriaId === 'all') {
-      this.serviciosFiltrados = this.servicios;
-    } else {
-      this.serviciosFiltrados = this.servicios.filter(
-        servicio => servicio.objCategoria?.id === categoriaId
-      );
-    }
+
+    // Convertimos 'all' a 0 para que el servicio lo entienda
+    const idParaPeticion = categoriaId === 'all' ? 0 : Number(categoriaId);
+
+    this.objServicioService.getServiciosPorCategoria(idParaPeticion).subscribe(
+      servicios => {
+        this.serviciosFiltrados = servicios;
+      },
+      error => {
+        console.error('Error al cargar servicios por categoría:', error);
+        // En caso de error, mostramos una lista vacía para que el usuario vea el mensaje
+        this.serviciosFiltrados = [];
+      }
+    );
   }
 
   editarServicio(id: number): void {
     this.router.navigate(['/servicios/actualizar', id]);
   }
 
+  // --- FUNCIÓN DE ELIMINACIÓN MEJORADA ---
   eliminarServicio(id: number): void {
     Swal.fire({
       title: '¿Desea eliminar el servicio?',
@@ -74,9 +85,11 @@ export class ListarServiciosComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.objServicioService.deleteServicio(id).subscribe(() => {
-          this.servicios = this.servicios.filter(s => s.id !== id);
-          this.serviciosFiltrados = this.serviciosFiltrados.filter(s => s.id !== id);
           Swal.fire('Eliminado', 'El servicio ha sido eliminado.', 'success');
+          
+          // En lugar de filtrar arrays manualmente, simplemente volvemos a cargar
+          // los datos del filtro que ya estaba activo. Es más limpio y seguro.
+          this.filtrarServicios(this.categoriaActiva);
         });
       }
     });

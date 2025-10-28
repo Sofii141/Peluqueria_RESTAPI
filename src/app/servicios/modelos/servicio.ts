@@ -8,5 +8,5 @@ export class Servicio {
     imagen!: string;
     fechaCreacion!: string; 
     disponible!: boolean;
-    objCategoria: Categoria | null = null;
+    categoria: Categoria | null = null; 
 }
